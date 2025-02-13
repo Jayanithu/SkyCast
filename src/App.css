@@ -1,0 +1,141 @@
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(to bottom, #3b82f6, #1e40af);
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+}
+
+/* Main Container */
+.app-container {
+  width: 100%;
+  max-width: 500px;
+  background: white;
+  color: #1e293b;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+/* Title */
+.app-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1e3a8a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Search Bar */
+.search-bar {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 1rem;
+}
+
+.search-input {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #60a5fa;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 8px rgba(37, 99, 235, 0.5);
+}
+
+.search-button {
+  background: #fbbf24;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.search-button:hover {
+  background: #f59e0b;
+}
+
+/* Weather Box */
+.weather-box {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: #eff6ff;
+  border-radius: 12px;
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.weather-box h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1e3a8a;
+}
+
+.weather-box p {
+  font-size: 1rem;
+  color: #374151;
+  margin-top: 5px;
+}
+
+.favorites-container {
+  margin-top: 1.5rem;
+}
+
+.favorite-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #dbeafe;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 8px;
+  transition: 0.3s ease;
+}
+
+.favorite-item:hover {
+  background: #bfdbfe;
+}
+
+/* Favorite Button */
+.favorite-button {
+  background: #2563eb;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.favorite-button:hover {
+  background: #1d4ed8;
+}
+
+/* Remove Favorite Button */
+.remove-button {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 5px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.remove-button:hover {
+  background: #b91c1c;
+}

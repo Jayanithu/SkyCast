@@ -1,4 +1,4 @@
-=-# 🌤️ SkyCast - A Modern Weather App
+# 🌤️ SkyCast - A Modern Weather App
 ## 🚀 Project Overview
 
 SkyCast is a modern, user-friendly weather app built using React & OpenWeather API. It allows users to search for current weather, save favorite cities, and explore features like:

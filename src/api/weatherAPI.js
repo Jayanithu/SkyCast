@@ -5,10 +5,23 @@ const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
 
 export const fetchWeather = async (city) => {
   try {
-    const response = await axios.get(`${BASE_URL}?q=${city}&units=metric&appid=${API_KEY}`);
+    const response = await axios.get(BASE_URL, {
+      params: {
+        q: city,
+        units: 'metric',
+        appid: API_KEY
+      }
+    });
     return response.data;
   } catch (error) {
-    console.error("Error fetching weather:", error);
-    return null;
+    if (error.response) {
+      // API responded with an error
+      if (error.response.status === 404) {
+        throw new Error('City not found');
+      }
+      throw new Error(error.response.data.message || 'Failed to fetch weather data');
+    }
+    // Network error or other issues
+    throw new Error('Network error. Please check your connection');
   }
 };

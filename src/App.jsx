@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { FaSearch, FaStar, FaTrash, FaMoon, FaSun } from "react-icons/fa";
-import { WiDaySunny, WiCloudy, WiRain, WiSnow, WiThunderstorm, WiDust } from "react-icons/wi";
+import { FaSearch, FaStar, FaTrash, FaMoon, FaSun, FaCompass, FaMapMarkerAlt } from "react-icons/fa";
+import { WiDaySunny, WiCloudy, WiRain, WiSnow, WiThunderstorm, WiDust, WiHumidity, WiStrongWind, WiSunrise, WiSunset, WiBarometer } from "react-icons/wi";
 import { motion, AnimatePresence } from "framer-motion";
 import { fetchWeather } from "./api/weatherAPI";
 import "./App.css"; // Import CSS file
@@ -45,6 +45,19 @@ export default function App() {
       month: 'long',
       day: '2-digit'
     });
+  };
+
+  const formatTime = (timestamp) => {
+    return new Date(timestamp * 1000).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const getWindDirection = (degrees) => {
+    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+    const index = Math.round(degrees / 45) % 8;
+    return directions[index];
   };
 
   const handleSubmit = async (e) => {
@@ -106,134 +119,161 @@ export default function App() {
           {darkMode ? <FaSun className="sun-icon" /> : <FaMoon className="moon-icon" />}
         </motion.button>
 
-        <div 
-          className="weather-card"
-          data-weather={weather?.weather[0]?.main || 'Clear'}
-        >
-          {/* Location Input Section */}
-          <div className="location-section">
-            <motion.label 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="location-label"
-            >
-              LOCATION
-            </motion.label>
-            <form onSubmit={handleSubmit} className="location-form">
-              <motion.input
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="Enter city name"
-                className="location-input"
-                whileFocus={{ scale: 1.02 }}
-              />
-              <motion.button
-                type="submit"
-                className="set-button"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                disabled={loading}
-              >
-                {loading ? 'LOADING...' : 'SET'}
-              </motion.button>
-            </form>
-          </div>
-
-          {/* Weather Display Section */}
-          <AnimatePresence mode="wait">
-            {weather && (
-              <motion.div
-                key="weather"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="weather-display"
-              >
-                <div className="weather-info">
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                  >
-                    {getWeatherIcon(weather.weather[0].main)}
-                  </motion.div>
-                  <motion.div 
-                    className="temperature"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    {Math.round(weather.main.temp)}°
-                  </motion.div>
-                  <motion.div 
-                    className="weather-description"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                  >
-                    {weather.weather[0].main}
-                  </motion.div>
-                  <motion.div 
-                    className="date"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                  >
-                    {formatDate()}
-                  </motion.div>
-
-                  {/* Favorite Button */}
-                  <motion.button
-                    className={`favorite-button ${isFavorite ? 'active' : ''}`}
-                    onClick={toggleFavorite}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <FaStar />
-                  </motion.button>
-                </div>
-              </motion.div>
-            )}
-
-            {error && (
-              <motion.div
-                key="error"
+        <div className="weather-layout">
+          {/* Left Section - Search and Location */}
+          <div className="left-section">
+            <div className="search-section">
+              <motion.label 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="error-message"
+                className="location-label"
               >
-                {error}
+                LOCATION
+              </motion.label>
+              
+              <form onSubmit={handleSubmit} className="location-form">
+                <motion.input
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Enter city name"
+                  className="location-input"
+                  whileFocus={{ scale: 1.02 }}
+                />
+                <motion.button
+                  type="submit"
+                  className="set-button"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  disabled={loading}
+                >
+                  {loading ? 'LOADING...' : 'SET'}
+                </motion.button>
+              </form>
+            </div>
+
+            {/* Favorites List */}
+            {favorites.length > 0 && (
+              <motion.div 
+                className="favorites-list"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <h3>Saved Locations</h3>
+                {favorites.map(fav => (
+                  <motion.button
+                    key={fav}
+                    className="favorite-city"
+                    onClick={() => {
+                      setCity(fav);
+                      handleSubmit(new Event('submit'));
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {fav}
+                  </motion.button>
+                ))}
               </motion.div>
             )}
-          </AnimatePresence>
-        </div>
+          </div>
 
-        {/* Favorites List */}
-        {favorites.length > 0 && (
-          <motion.div 
-            className="favorites-list"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            <h3>Favorite Cities</h3>
-            {favorites.map(fav => (
-              <motion.button
-                key={fav}
-                className="favorite-city"
-                onClick={() => {
-                  setCity(fav);
-                  handleSubmit(new Event('submit'));
-                }}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                {fav}
-              </motion.button>
-            ))}
-          </motion.div>
-        )}
+          {/* Right Section - Weather Display */}
+          <div className="right-section">
+            <AnimatePresence mode="wait">
+              {weather && (
+                <motion.div
+                  key="weather"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="weather-display"
+                >
+                  {/* Main Weather Info */}
+                  <div className="weather-main">
+                    <div className="weather-header">
+                      <div className="location-details">
+                        <h2>{weather.name}, {weather.sys.country}</h2>
+                        <span className="coordinates">
+                          {weather.coord.lat.toFixed(2)}°N, {weather.coord.lon.toFixed(2)}°E
+                        </span>
+                      </div>
+                      <motion.button
+                        className={`favorite-button ${isFavorite ? 'active' : ''}`}
+                        onClick={toggleFavorite}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        <FaStar />
+                      </motion.button>
+                    </div>
+
+                    <div className="current-weather">
+                      {getWeatherIcon(weather.weather[0].main)}
+                      <div className="temperature-display">
+                        <span className="temperature">{Math.round(weather.main.temp)}°</span>
+                        <span className="weather-description">{weather.weather[0].main}</span>
+                      </div>
+                    </div>
+
+                    {/* Weather Details Grid */}
+                    <div className="weather-details-grid">
+                      <div className="detail-card">
+                        <WiHumidity className="detail-icon" />
+                        <div className="detail-info">
+                          <span className="detail-value">{weather.main.humidity}%</span>
+                          <span className="detail-label">Humidity</span>
+                        </div>
+                      </div>
+
+                      <div className="detail-card">
+                        <WiStrongWind className="detail-icon" />
+                        <div className="detail-info">
+                          <span className="detail-value">
+                            {weather.wind.speed} m/s
+                            <FaCompass 
+                              className="wind-direction"
+                              style={{ transform: `rotate(${weather.wind.deg}deg)` }}
+                            />
+                          </span>
+                          <span className="detail-label">Wind</span>
+                        </div>
+                      </div>
+
+                      <div className="detail-card">
+                        <WiSunrise className="detail-icon" />
+                        <div className="detail-info">
+                          <span className="detail-value">{formatTime(weather.sys.sunrise)}</span>
+                          <span className="detail-label">Sunrise</span>
+                        </div>
+                      </div>
+
+                      <div className="detail-card">
+                        <WiSunset className="detail-icon" />
+                        <div className="detail-info">
+                          <span className="detail-value">{formatTime(weather.sys.sunset)}</span>
+                          <span className="detail-label">Sunset</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {error && (
+                <motion.div
+                  key="error"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="error-message"
+                >
+                  {error}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
       </motion.div>
     </>
   );

@@ -122,58 +122,84 @@ export default function App() {
         <div className="weather-layout">
           {/* Left Section - Search and Location */}
           <div className="left-section">
-            <div className="search-section">
-              <motion.label 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="location-label"
+            <div className="search-card">
+              <motion.h2 
+                className="text-3xl font-bold text-white/90 mb-8 text-center tracking-wide"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
               >
                 LOCATION
-              </motion.label>
+              </motion.h2>
               
-              <form onSubmit={handleSubmit} className="location-form">
-                <motion.input
-                  type="text"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  placeholder="Enter city name"
-                  className="location-input"
-                  whileFocus={{ scale: 1.02 }}
-                />
-                <motion.button
-                  type="submit"
-                  className="set-button"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  disabled={loading}
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                <motion.div 
+                  className="search-input-container"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
                 >
-                  {loading ? 'LOADING...' : 'SET'}
-                </motion.button>
-              </form>
-            </div>
-
-            {/* Favorites List */}
-            {favorites.length > 0 && (
-              <motion.div 
-                className="favorites-list"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
-                <h3>Saved Locations</h3>
-                {favorites.map(fav => (
+                  <input
+                    type="text"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    placeholder="Enter city name"
+                    className="search-input"
+                  />
                   <motion.button
-                    key={fav}
-                    className="favorite-city"
-                    onClick={() => {
-                      setCity(fav);
-                      handleSubmit(new Event('submit'));
-                    }}
+                    type="submit"
+                    className="search-button"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
+                    disabled={loading}
                   >
-                    {fav}
+                    {loading ? (
+                      <div className="loading-spinner" />
+                    ) : (
+                      <span className="font-semibold tracking-wider">SET</span>
+                    )}
                   </motion.button>
-                ))}
+                </motion.div>
+              </form>
+
+              {error && (
+                <motion.div
+                  className="error-message"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  {error}
+                </motion.div>
+              )}
+            </div>
+
+            {/* Favorites List with new styling */}
+            {favorites.length > 0 && (
+              <motion.div 
+                className="favorites-card"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                <h3 className="text-sm font-medium text-white/70 uppercase tracking-wider mb-3">
+                  Saved Locations
+                </h3>
+                <div className="favorites-grid">
+                  {favorites.map(fav => (
+                    <motion.button
+                      key={fav}
+                      className="favorite-item"
+                      onClick={() => {
+                        setCity(fav);
+                        handleSubmit(new Event('submit'));
+                      }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <FaMapMarkerAlt className="text-blue-400" />
+                      <span>{fav}</span>
+                    </motion.button>
+                  ))}
+                </div>
               </motion.div>
             )}
           </div>

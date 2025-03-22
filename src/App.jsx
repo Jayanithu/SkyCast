@@ -138,7 +138,7 @@ export default function App() {
           {darkMode ? <FaSun className="sun-icon" /> : <FaMoon className="moon-icon" />}
         </motion.button>
 
-        <div className="weather-layout">
+        <div className={`weather-layout ${!weather ? 'initial-state' : ''}`}>
           {/* Left Section - Search and Location */}
           <div className="left-section">
             <div className="search-card">

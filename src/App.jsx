@@ -95,13 +95,32 @@ export default function App() {
 
   const isFavorite = weather && favorites.includes(weather.name);
 
+  // Add a new function to determine weather background class
+  const getWeatherBackgroundClass = (weatherCode) => {
+    const code = weatherCode?.toLowerCase();
+    switch (true) {
+      case code?.includes('clear'): return 'clear';
+      case code?.includes('cloud'): return 'clouds';
+      case code?.includes('rain'): return 'rain';
+      case code?.includes('snow'): return 'snow';
+      case code?.includes('thunder'): return 'thunderstorm';
+      case code?.includes('mist'): return 'mist';
+      default: return 'default';
+    }
+  };
+
   return (
     <>
+      {/* Dynamic weather background */}
+      {weather && (
+        <div className={`weather-background ${getWeatherBackgroundClass(weather.weather[0].main)}`}></div>
+      )}
+      
       <div className="background-shapes">
-        <div className="shape"></div>
-        <div className="shape"></div>
-        <div className="shape"></div>
-        <div className="shape"></div>
+        <div className="shape shape-1"></div>
+        <div className="shape shape-2"></div>
+        <div className="shape shape-3"></div>
+        <div className="shape shape-4"></div>
       </div>
       
       <motion.div 
@@ -109,7 +128,7 @@ export default function App() {
         animate={{ opacity: 1, y: 0 }}
         className="app-container"
       >
-        {/* Theme Toggle */}
+        {/* Theme Toggle - improved positioning and styling */}
         <motion.button
           className="theme-toggle"
           onClick={() => setDarkMode(!darkMode)}

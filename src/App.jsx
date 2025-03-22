@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { FaSearch, FaStar, FaTrash, FaMoon, FaSun, FaCompass, FaMapMarkerAlt } from "react-icons/fa";
 import { WiDaySunny, WiCloudy, WiRain, WiSnow, WiThunderstorm, WiDust, WiHumidity, WiStrongWind, WiSunrise, WiSunset, WiBarometer } from "react-icons/wi";
 import { motion, AnimatePresence } from "framer-motion";
-import { fetchWeather } from "./api/weatherAPI";
+import { fetchWeather, fetchWeatherByCoords } from "./api/weatherAPI";
 import "./App.css"; // Import CSS file
 
 export default function App() {
@@ -16,6 +16,10 @@ export default function App() {
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem('darkMode') === 'true';
   });
+  
+  // New state for location detection
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [locationError, setLocationError] = useState(null);
 
   useEffect(() => {
     document.body.classList.toggle('dark-mode', darkMode);
@@ -109,6 +113,67 @@ export default function App() {
     }
   };
 
+  // New function to detect user's location
+  // Add this function to your component if it's not already there
+  // In your App.jsx file, update the detectLocation function:
+  
+  const detectLocation = () => {
+    setLocationLoading(true);
+    // Clear any existing errors
+    setError(null);
+    
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser");
+      setLocationLoading(false);
+      return;
+    }
+    
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    };
+    
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          console.log("Got coordinates:", latitude, longitude);
+          const data = await fetchWeatherByCoords(latitude, longitude);
+          
+          if (data) {
+            setWeather(data);
+            setCity(data.name); // Update the city input with detected location name
+            setError(null); // Clear any errors on success
+          }
+        } catch (err) {
+          console.error("Error in location detection:", err);
+          setError("Failed to fetch weather for your location");
+        } finally {
+          setLocationLoading(false);
+        }
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        let errorMessage;
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = "Location permission denied";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = "Location information unavailable";
+            break;
+          case error.TIMEOUT:
+            errorMessage = "Location request timed out";
+            break;
+          default:
+            errorMessage = "An unknown error occurred";
+        }
+        setError(errorMessage);
+        setLocationLoading(false);
+      }
+    );
+  };
   return (
     <>
       {/* Dynamic weather background */}
@@ -128,7 +193,7 @@ export default function App() {
         animate={{ opacity: 1, y: 0 }}
         className="app-container"
       >
-        {/* Theme Toggle - improved positioning and styling */}
+        {/* Theme Toggle */}
         <motion.button
           className="theme-toggle"
           onClick={() => setDarkMode(!darkMode)}
@@ -136,6 +201,17 @@ export default function App() {
           whileTap={{ scale: 0.9 }}
         >
           {darkMode ? <FaSun className="sun-icon" /> : <FaMoon className="moon-icon" />}
+        </motion.button>
+        
+        {/* Location Button */}
+        <motion.button
+          className="location-button"
+          onClick={detectLocation}
+          disabled={locationLoading}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          <FaMapMarkerAlt className="location-icon" />
         </motion.button>
 
         <div className={`weather-layout ${!weather ? 'initial-state' : ''}`}>
@@ -150,45 +226,51 @@ export default function App() {
                 LOCATION
               </motion.h2>
               
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <motion.div 
-                  className="search-input-container"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                >
+              <form onSubmit={handleSubmit}>
+                <div className="search-input-container">
                   <input
                     type="text"
+                    className="search-input"
+                    placeholder="Enter city name"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    placeholder="Enter city name"
-                    className="search-input"
                   />
-                  <motion.button
-                    type="submit"
-                    className="search-button"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <div className="loading-spinner" />
-                    ) : (
-                      <span className="font-semibold tracking-wider">SET</span>
-                    )}
-                  </motion.button>
-                </motion.div>
-              </form>
-
-              {error && (
-                <motion.div
-                  className="error-message"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                </div>
+                
+                <button
+                  type="submit"
+                  className="search-button"
+                  disabled={loading || !city.trim()}
                 >
-                  {error}
-                </motion.div>
-              )}
+                  {loading ? <div className="loading-spinner"></div> : "SET"}
+                </button>
+              </form>
+              
+              {/* Location detection button */}
+              <div className="location-detection">
+                <button 
+                  className="detect-location-button"
+                  onClick={detectLocation}
+                  disabled={locationLoading}
+                >
+                  {locationLoading ? (
+                    <div className="loading-spinner"></div>
+                  ) : (
+                    <>
+                      <FaMapMarkerAlt className="location-icon" />
+                      Use My Location
+                    </>
+                  )}
+                </button>
+                
+                {locationError && (
+                  <div className="error-message">
+                    {locationError}
+                  </div>
+                )}
+              </div>
+              
+              {error && <div className="error-message">{error}</div>}
             </div>
 
             {/* Favorites List with new styling */}

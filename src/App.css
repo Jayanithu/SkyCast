@@ -40,6 +40,13 @@ body.dark-mode {
   width: 100%;
 }
 
+/* Initial state for the layout when no weather data is present */
+.weather-layout.initial-state {
+  grid-template-columns: 1fr;
+  max-width: 450px;
+  margin: 0 auto;
+}
+
 /* Left section - improve centering */
 .left-section {
   display: flex;

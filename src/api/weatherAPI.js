@@ -25,3 +25,24 @@ export const fetchWeather = async (city) => {
     throw new Error('Network error. Please check your connection');
   }
 };
+
+// New function to fetch weather by coordinates
+// Add this function if it's not already there
+export const fetchWeatherByCoords = async (lat, lon) => {
+  try {
+    const response = await axios.get(BASE_URL, {
+      params: {
+        lat,
+        lon,
+        units: 'metric',
+        appid: API_KEY
+      }
+    });
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(error.response.data.message || 'Failed to fetch weather data');
+    }
+    throw new Error('Network error. Please check your connection');
+  }
+};

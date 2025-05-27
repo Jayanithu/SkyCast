@@ -26,8 +26,6 @@ export const fetchWeather = async (city) => {
   }
 };
 
-// New function to fetch weather by coordinates
-// Add this function if it's not already there
 export const fetchWeatherByCoords = async (lat, lon) => {
   try {
     const response = await axios.get(BASE_URL, {
